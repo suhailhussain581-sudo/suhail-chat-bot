@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Suhail Chat Bot</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#151D30">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="space-bg"></div>
+  <div class="stars-overlay" id="starsOverlay"></div>
+
+  <div id="loginScreen" class="login-screen hidden">
+    <div class="login-box">
+      <div class="login-mark">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 3 L23 17 L37 20 L23 23 L20 37 L17 23 L3 20 L17 17 Z" fill="#D97757"/>
+        </svg>
+      </div>
+      <div class="login-title">Suhail Chat Bot</div>
+      <p class="login-subtitle">Sign in to pick up where you left off</p>
+      <div id="googleSignInBtn"></div>
+      <div class="login-divider"><span>Secure sign-in</span></div>
+      <p class="login-footnote">
+        By continuing, you agree to keep your conversations to yourself
+        (they're stored only on this device).
+      </p>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="sidebar" id="sidebar">
+      <button class="new-chat-btn" onclick="newChat()">
+        <span class="plus">+</span> New chat
+      </button>
+
+      <div class="persona-picker">
+        <div class="sidebar-label">Persona</div>
+        <select id="personaSelect" onchange="setPersona(this.value)">
+          <option value="default">General assistant</option>
+          <option value="coding">Coding helper</option>
+          <option value="tutor">Patient tutor</option>
+          <option value="writer">Writing coach</option>
+        </select>
+      </div>
+
+      <div class="sidebar-label-row">
+        <span class="sidebar-label">Recent</span>
+        <select id="folderFilter" onchange="renderHistoryList()">
+          <option value="all">All folders</option>
+        </select>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <div class="main">
+      <div class="main-header">
+        <div class="header-left">
+          <button class="icon-btn" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+          <span class="header-title">Suhail Chat Bot</span>
+        </div>
+        <div class="header-right">
+          <span id="userGreeting" class="user-greeting"></span>
+          <button class="clear-btn" onclick="clearChat()" title="Clear chat">Clear</button>
+          <div class="overflow-menu-wrapper">
+            <button onclick="shareCurrentSession(); toggleOverflowMenu()">🔗 Share this chat</button>
+            <button class="icon-btn" onclick="toggleOverflowMenu()" title="More options">⋮</button>
+            <div id="overflowMenu" class="overflow-menu hidden">
+              <button onclick="exportChatAsMarkdown(); toggleOverflowMenu()">⬇️ Export as Markdown</button>
+              <button onclick="exportChatAsPDF(); toggleOverflowMenu()">⬇️ Export as PDF</button>
+              <button onclick="toggleShortcutsModal(); toggleOverflowMenu()">⌘ Keyboard shortcuts</button>
+              <button id="speechToggleBtn" onclick="toggleSpeech(); toggleOverflowMenu()">🔊 Toggle voice reply</button>
+              <button onclick="signOutUser()">🚪 Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pinnedBar" class="pinned-bar hidden"></div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div id="dropOverlay" class="drop-overlay hidden">Drop file to attach</div>
+      </div>
+
+      <div id="filePreviewBar" class="image-preview-bar"></div>
+      <div id="imagePreviewBar" class="image-preview-bar"></div>
+
+      <div class="input-bar">
+        <div class="input-shell">
+          <button onclick="document.getElementById('imageUpload').click()" id="imageBtn" title="Upload image">📷</button>
+          <input type="file" id="imageUpload" accept="image/*" hidden>
+          <button onclick="document.getElementById('fileUpload').click()" id="fileBtn" title="Upload file">📎</button>
+          <input type="file" id="fileUpload" accept=".txt,.md,.csv,.json,.pdf" hidden>
+          <textarea id="userInput" placeholder="Message Suhail Chat Bot..." rows="1"></textarea>
+          <button onclick="toggleVoiceInput()" id="micBtn" title="Voice input">🎤</button>
+          <button onclick="openVoiceMode()" id="voiceModeBtn" title="Voice conversation">🎙️</button>
+          <button onclick="sendMessage()" id="sendBtn" title="Send">↑</button>
+          <button onclick="stopGenerating()" id="stopBtn" title="Stop generating" class="hidden">■</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="voice-overlay hidden" id="voiceOverlay">
+    <div class="voice-orb" id="voiceOrb"></div>
+    <div class="voice-status" id="voiceStatus">Listening...</div>
+    <button class="voice-close-btn" onclick="closeVoiceMode()">✕ End conversation</button>
+  </div>
+
+  <div id="shortcutsModal" class="shortcuts-modal hidden">
+    <div class="shortcuts-box">
+      <div class="shortcuts-title">Keyboard shortcuts</div>
+      <div class="shortcut-row"><span>New chat</span><kbd>Ctrl/Cmd + K</kbd></div>
+      <div class="shortcut-row"><span>Toggle sidebar</span><kbd>Ctrl/Cmd + B</kbd></div>
+      <div class="shortcut-row"><span>Show this menu</span><kbd>Ctrl/Cmd + /</kbd></div>
+      <div class="shortcut-row"><span>Close menu</span><kbd>Esc</kbd></div>
+      <button class="voice-close-btn" onclick="toggleShortcutsModal()">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch((err) => console.error("SW registration failed:", err));
+  }
+</script>
+</body>
+</html>
