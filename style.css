@@ -931,6 +931,8 @@ body {
     height: 100%;
     z-index: 150;
     width: 240px;
+    transform:translateX(-100%);
+    transition:transform 0.25s ease;
   }
 
   .sidebar:not(.collapsed) {
