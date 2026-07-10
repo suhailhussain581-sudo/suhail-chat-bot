@@ -32,8 +32,12 @@ const PERSONAS = {
 };
 window.addEventListener("load", async () => {
   createStars();
+  if (window.innerWidth <= 768) {
+    document.getElementById("sidebar").classList.add("collapsed");
+  }
 
   const isSharedView = await loadSharedSessionIfPresent();
+  
   if (isSharedView) return;
 
   setupInputAutoResize();
