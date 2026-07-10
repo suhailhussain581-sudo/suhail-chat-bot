@@ -924,6 +924,54 @@ body {
 }
 /* ---- Mobile responsiveness ---- */
 @media (max-width: 768px) {
+  .message-text {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .welcome-title {
+    font-size: 22px;
+  }
+
+  .chip {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .timestamp,
+  .msg-action-btn {
+    font-size: 13px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .input-shell textarea {
+    font-size: 16px;
+    padding: 10px 4px;
+  }
+
+  .input-shell > button {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .main-header {
+    padding: 14px 16px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .clear-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
   .sidebar {
     position: fixed;
     top: 0;
