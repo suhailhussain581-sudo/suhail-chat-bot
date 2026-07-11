@@ -653,7 +653,10 @@ async function streamBotReplyForVoice() {
 // ---- Sidebar / time ----
 
 function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("collapsed");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  sidebar.classList.toggle("collapsed");
+  if (overlay) overlay.classList.toggle("hidden", sidebar.classList.contains("collapsed"));
 }
 
 function formatTime(ts) {
