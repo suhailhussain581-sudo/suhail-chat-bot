@@ -1,4 +1,4 @@
-const CACHE_NAME = "suhail-chatbot-v3";
+const CACHE_NAME = "suhail-chatbot-v4";
 const urlsToCache = [
   "/",
   "/index.html",
