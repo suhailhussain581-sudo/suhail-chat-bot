@@ -7,6 +7,7 @@ body {
   font-family: -apple-system, "Segoe UI", Arial, sans-serif;
   color: #E8EAED;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   position: relative;
 }
@@ -163,6 +164,7 @@ body {
 .app {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   background: transparent;
 }
 
@@ -961,16 +963,25 @@ body {
   }
 
   .main-header {
-    padding: 14px 16px;
-  }
+      padding: 10px 14px;
+      flex-wrap: nowrap;
+      gap: 6px;
+    }
 
-  .header-title {
-    font-size: 16px;
-  }
+    .header-title {
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .clear-btn {
-    font-size: 12px;
-    padding: 6px 12px;
+    .header-right {
+      flex-wrap: nowrap;
+      gap: 4px;
+    }
+
+    .clear-btn {
+      display: none;
   }
   .sidebar {
     position: fixed;
